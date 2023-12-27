@@ -1,0 +1,14 @@
+
+board_indices = 0, 1, 2, 3
+
+computer_indices = 2, 3
+
+every move combo (assuming no hands are terminated)
+
+2
+    0
+    1
+
+3
+    0
+    1
