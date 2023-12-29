@@ -12,3 +12,7 @@ every move combo (assuming no hands are terminated)
 3
     0
     1
+
+terminate_hands
+update_board
+split_hands
