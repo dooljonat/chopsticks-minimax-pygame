@@ -5,9 +5,13 @@ from mini_max_agent import MiniMax
 
 class Game:
     def __init__(self,
+                first_player=choice([Player.PLAYER, Player.COMPUTER]),
                 board=GameSettings.DEFAULT_BOARD,
                 num_turns_resulting_in_draw=GameSettings.DEFAULT_TURNS_RESULTING_IN_DRAW):
         self.current_board = board
+        self.current_player = first_player
+        self.current_turn = 1
+
         self.num_turns_resulting_in_draw = num_turns_resulting_in_draw
 
         self.minimax_agent = MiniMax(self)
@@ -70,7 +74,7 @@ class Game:
 
             player_hand_moved = input("\tWhich of your hands would you like to play?\n\tPlease enter either 1 or 2\n\tOr enter 0 to split hands\n\n")
 
-            print("Opponent's hands: '")
+            print("Opponent's hands: ")
             print(self.print_hands(self.current_board, GameSettings.COMPUTER_INDICES))
             opponent_hand_picked = input("\tWhich of the opponent's hands would you like to add to?\n\tPlease enter either 1 or 2\n\n")
 
@@ -100,8 +104,8 @@ class Game:
     def move_minimax_agent_computer(self, board, current_turn):
         move = self.minimax_agent.get_best_move(board, current_turn)
 
-        print("CURRENT BOARD: ", board)
-        print("MINIMAX SELECTED: ", move)
+        # print("CURRENT BOARD: ", board)
+        # print("MINIMAX SELECTED: ", move)
 
         if move == ["S"]:
             self.current_board = self.split_hands(board, GameSettings.COMPUTER_INDICES)
@@ -144,43 +148,28 @@ class Game:
 
         return _board
     
-    def play(self):
-        current_state = GameState.RUNNING
-        current_player = choice([Player.PLAYER, Player.COMPUTER])
-        current_turn = 1
+    def play_next_turn(self):
+        print("Currently on turn: " + str(self.current_turn))
+        self.print_board(self.current_board)
 
-        print("Welcome to finger chess game!\nn")
+        # Player's turn
+        if self.current_player == Player.PLAYER:
+            self.move_player()
 
-        while current_state == GameState.RUNNING:
-            print("Currently on turn: " + str(current_turn))
-            self.print_board(self.current_board)
+            # Switch player
+            self.current_player = Player.COMPUTER
 
-            # Player's turn
-            if current_player == Player.PLAYER:
-                self.move_player()
-
-                # Switch player
-                current_player = Player.COMPUTER
-
-            # Computer's turn
-            elif current_player == Player.COMPUTER:
-                print("\tComputer is making their move....\n\n")
-                self.move_minimax_agent_computer(self.current_board, current_turn=current_turn)
-                
-                # Switch player
-                current_player = Player.PLAYER
-
-            # Check state
-            self.current_board = self.terminate_hands(self.current_board)
-            current_state = self.check_state(self.current_board, current_turn)
+        # Computer's turn
+        elif self.current_player == Player.COMPUTER:
+            print("\tComputer is making their move....\n\n")
+            self.move_minimax_agent_computer(self.current_board, current_turn=self.current_turn)
             
-            current_turn += 1
+            # Switch player
+            self.current_player = Player.PLAYER
 
-        if current_state == GameState.DRAW:
-            print("Game was a tie!")
-        else:
-            _ = self.get_winner(self.current_board, current_turn)
-            if _ == Player.PLAYER:
-                print("You won!")
-            if _ ==  Player.COMPUTER:
-                print("Computer won!")
+        # Incr. current turn #
+        self.current_turn += 1
+
+        # Return current state after this turn
+        self.current_board = self.terminate_hands(self.current_board)
+        return self.check_state(self.current_board, self.current_turn)

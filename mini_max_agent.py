@@ -24,10 +24,10 @@ class MiniMax:
             player_total = current_board[0] + current_board[1]
             computer_total = current_board[2] + current_board[3]
     
-            player_term_percent = player_total/10
-            computer_term_percent = computer_total/10
+            # player_term_percent = player_total/10
+            # computer_term_percent = computer_total/10
 
-            current_score = 5 if computer_term_percent < player_term_percent else -5
+            current_score = player_total-computer_total
 
         return state, current_score
 
@@ -91,15 +91,16 @@ class MiniMax:
             possible_score_outcomes.append(self.minimax(_board, last_known_turn_number, next_player, depth))
              
 
+        # possible_score_outcomes.sort()
+        # for outcome in possible_score_outcomes:
+        #     print(possible_score_outcomes)
+        # print()
+
         # If our current goal is to maximize (current player is computer), return max
         # else, (current player is player), return min
-        possible_score_outcomes.sort()
-        for outcome in possible_score_outcomes:
-            print(possible_score_outcomes)
-
-        return (max(possible_score_outcomes) 
+        return (max(possible_score_outcomes, default="MAXIMUM") 
                 if current_player == Player.COMPUTER 
-                else min(possible_score_outcomes))
+                else min(possible_score_outcomes, default="MINIMUM"))
 
     def get_best_move(self, board, current_turn_number, current_player=Player.COMPUTER):
         bestScore = -math.inf
