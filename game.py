@@ -142,7 +142,11 @@ class Game:
 
         vals = [_board[i] for i in target_indices]
         vals.sort()
-        new_val = vals[1]/2
+        new_val = None
+        if vals[0] == 2:
+            new_val = 1
+        else:
+            new_val = vals[0]/2
         for indx in target_indices:
             _board[indx] = int(new_val)
 

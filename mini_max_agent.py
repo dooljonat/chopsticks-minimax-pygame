@@ -10,6 +10,10 @@ class MiniMax:
     def __init__(self, game):
         self.game = game 
 
+    def is_after_split(self, current_board, current_turn_number):
+        vals = [current_board[2], current_board[3]]
+        return (vals[0] == vals[1]) and sum(vals)%2==0 and sum(vals) <= 4
+
     def score_game(self, current_board, current_turn_number):
         state = self.game.check_state(current_board, current_turn_number)
         current_score = 0
@@ -23,9 +27,6 @@ class MiniMax:
             # and how far away to terminated computer's hands are
             player_total = current_board[0] + current_board[1]
             computer_total = current_board[2] + current_board[3]
-    
-            # player_term_percent = player_total/10
-            # computer_term_percent = computer_total/10
 
             current_score = player_total-computer_total
 
@@ -72,6 +73,8 @@ class MiniMax:
                 or state == GameState.DRAW 
                 or depth >= MiniMaxSettings.MAX_LOOK_DEPTH):
             return score
+        elif (self.is_after_split(current_board, current_turn_number)):
+            return 10
 
         # Get possible moves, and their respective score outcomes
         possible_score_outcomes = []
@@ -98,9 +101,9 @@ class MiniMax:
 
         # If our current goal is to maximize (current player is computer), return max
         # else, (current player is player), return min
-        return (max(possible_score_outcomes, default="MAXIMUM") 
+        return (max(possible_score_outcomes, default=10) 
                 if current_player == Player.COMPUTER 
-                else min(possible_score_outcomes, default="MINIMUM"))
+                else min(possible_score_outcomes, default=0))
 
     def get_best_move(self, board, current_turn_number, current_player=Player.COMPUTER):
         bestScore = -math.inf
