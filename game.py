@@ -1,6 +1,6 @@
 from random import randint, choice
 
-from util import GameSettings, GameState, Player
+from settings import GameSettings, GameState, Player
 from mini_max_agent import MiniMax
 
 class Game:

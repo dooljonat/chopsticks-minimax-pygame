@@ -1,7 +1,7 @@
 import copy
 import math
 
-from util import GameSettings, MiniMaxSettings, GameState, Player
+from settings import GameSettings, MiniMaxSettings, GameState, Player
 
 class MiniMax:
     all_possible_computer_moves = [["S"], [2, 0], [2, 1], [3, 0], [3, 1]]
