@@ -11,6 +11,43 @@ from display_settings import PygameSettings, ComputerSpritePaths
 class PlayerUI:
     pass
 
+class ComputerLeftHand:
+    def __init__(self):
+        self.palm_img = pygame.image.load(ComputerSpritePaths.left_hand_sprite_path)
+        self.thumb_img = pygame.image.load(ComputerSpritePaths.left_thumb_sprite_path)
+
+        self.pointer_imgs = [pygame.image.load(path) for path in ComputerSpritePaths.left_pointer_paths]
+        self.middle_imgs = [pygame.image.load(path) for path in ComputerSpritePaths.left_middle_paths]
+        self.ring_imgs = [pygame.image.load(path) for path in ComputerSpritePaths.left_ring_paths]
+        self.pinky_imgs = [pygame.image.load(path) for path in ComputerSpritePaths.left_pinky_paths]
+
+    def draw(self, screen, game):
+        # Draw palm
+        screen.blit(self.palm_img, PygameSettings.DEFAULT_POS)
+
+        # Get current count of computer's left hand in-game
+        hand_count = game.current_board[GameSettings.COMPUTER_LEFT_HAND]
+
+        # Draw fingers
+        fingers_up = [0,0,0,0]
+
+        if hand_count < 5:
+            for i in range(hand_count):
+                fingers_up[i] = 1
+
+        for i, val in enumerate(fingers_up):
+            if i == 0:
+                screen.blit(self.pointer_imgs[val], PygameSettings.DEFAULT_POS)
+            if i == 1:
+                screen.blit(self.middle_imgs[val], PygameSettings.DEFAULT_POS)
+            if i == 2:
+                screen.blit(self.ring_imgs[val], PygameSettings.DEFAULT_POS)
+            if i == 3:
+                screen.blit(self.pinky_imgs[val], PygameSettings.DEFAULT_POS)
+
+        # Draw thumb
+        screen.blit(self.thumb_img, PygameSettings.DEFAULT_POS)
+
 class ComputerRightHand:
     def __init__(self):
         self.palm_img = pygame.image.load(ComputerSpritePaths.right_hand_sprite_path)
@@ -27,7 +64,6 @@ class ComputerRightHand:
 
         # Get current count of computer's right hand in-game
         hand_count = game.current_board[GameSettings.COMPUTER_RIGHT_HAND]
-        print(hand_count)
 
         # Draw fingers
         fingers_up = [0,0,0,0]
@@ -53,11 +89,15 @@ class Computer:
     def __init__(self):
         self.img = pygame.image.load(ComputerSpritePaths.computer_sprite_path).convert_alpha()
 
+        self.left_hand = ComputerLeftHand()
         self.right_hand = ComputerRightHand()
 
     def draw(self, screen, game):
         # Draw self
         screen.blit(self.img, PygameSettings.DEFAULT_POS)
+
+        # Draw left hand
+        self.left_hand.draw(screen, game)
 
         # Draw right hand
         self.right_hand.draw(screen, game)
