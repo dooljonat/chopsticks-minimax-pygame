@@ -1,6 +1,6 @@
 import pygame
 
-from settings import GameSettings
+from settings import BoardInfo
 from display_settings import PygameSettings, ComputerSpritePaths
 
 # NOTE: All sprites use DEFAULT_POS because all sprites images are hardcoded to be 1280x720
@@ -26,7 +26,7 @@ class ComputerLeftHand:
         screen.blit(self.palm_img, PygameSettings.DEFAULT_POS)
 
         # Get current count of computer's left hand in-game
-        hand_count = game.current_board[GameSettings.COMPUTER_LEFT_HAND]
+        hand_count = game.current_board[BoardInfo.COMPUTER_LEFT_HAND]
 
         # Draw fingers
         fingers_up = [0,0,0,0]
@@ -63,7 +63,7 @@ class ComputerRightHand:
         screen.blit(self.palm_img, PygameSettings.DEFAULT_POS)
 
         # Get current count of computer's right hand in-game
-        hand_count = game.current_board[GameSettings.COMPUTER_RIGHT_HAND]
+        hand_count = game.current_board[BoardInfo.COMPUTER_RIGHT_HAND]
 
         # Draw fingers
         fingers_up = [0,0,0,0]

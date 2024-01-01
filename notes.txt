@@ -18,3 +18,40 @@ update_board
 split_hands
 
 
+
+current: computer
+
+player
+4 4
+
+computer
+1 2
+ 
+p 4 4 1 2
+c * 4 1 2
+p 2 2 1 2
+c 
+p
+c 
+p
+c 
+p
+c 
+p
+c 
+
+current turn player
+    when player 4 4 computer 1 1
+    player likely wins
+
+current turn computer
+    when player 3 2 computer 4 4
+    computer likely wins
+
+    when player 3 2 computer 1 3
+    computer likely wins
+
+board = [1, 5, 1, 3]
+
+
+2 * 4 4

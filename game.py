@@ -1,6 +1,6 @@
 from random import randint, choice
 
-from settings import GameSettings, GameState, Player
+from settings import GameSettings, BoardInfo, GameState, Player
 from mini_max_agent import MiniMax
 
 class Game:
@@ -29,11 +29,11 @@ class Game:
     def print_board(self, board):
         print("Current hands are:")
         print("# Player's: ")
-        print("# \t" + self.print_hands(board, GameSettings.PLAYER_INDICES))
+        print("# \t" + self.print_hands(board, BoardInfo.PLAYER_INDICES))
         print("Computer's: ")
-        print("# \t" + self.print_hands(board, GameSettings.COMPUTER_INDICES))
+        print("# \t" + self.print_hands(board, BoardInfo.COMPUTER_INDICES))
         print("\n")
-
+        
     def check_state(self, board, current_turn_number):
         # If game won
         if (board[0] == 5 and board[1] == 5) or (board[2] == 5 and board[3] == 5):
@@ -70,12 +70,12 @@ class Game:
 
         while not valid_move_made:
             print("Your hands: ")
-            print(self.print_hands(self.current_board, GameSettings.PLAYER_INDICES))
+            print(self.print_hands(self.current_board, BoardInfo.PLAYER_INDICES))
 
             player_hand_moved = input("\tWhich of your hands would you like to play?\n\tPlease enter either 1 or 2\n\tOr enter 0 to split hands\n\n")
 
             print("Opponent's hands: ")
-            print(self.print_hands(self.current_board, GameSettings.COMPUTER_INDICES))
+            print(self.print_hands(self.current_board, BoardInfo.COMPUTER_INDICES))
             opponent_hand_picked = input("\tWhich of the opponent's hands would you like to add to?\n\tPlease enter either 1 or 2\n\n")
 
             # Make move and add values together
@@ -108,7 +108,7 @@ class Game:
         # print("MINIMAX SELECTED: ", move)
 
         if move == ["S"]:
-            self.current_board = self.split_hands(board, GameSettings.COMPUTER_INDICES)
+            self.current_board = self.split_hands(board, BoardInfo.COMPUTER_INDICES)
         else:
             self.current_board = self.update_board(board, move[0], move[1])
 
@@ -116,7 +116,7 @@ class Game:
         return ((board[target_indx] < 5) 
             and (board[indx] < 5) 
             and (indx != target_indx) 
-            and (((indx in GameSettings.PLAYER_INDICES) and (target_indx in GameSettings.COMPUTER_INDICES)) or ((indx in GameSettings.COMPUTER_INDICES) or (target_indx in GameSettings.PLAYER_INDICES))))
+            and (((indx in BoardInfo.PLAYER_INDICES) and (target_indx in BoardInfo.COMPUTER_INDICES)) or ((indx in BoardInfo.COMPUTER_INDICES) or (target_indx in BoardInfo.PLAYER_INDICES))))
 
     def update_board(self, board, indx, target_indx):
         _board = board.copy()
