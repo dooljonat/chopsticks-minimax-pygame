@@ -16,7 +16,7 @@ class BoardInfo:
     COMPUTER_RIGHT_HAND = 3
 
 class MiniMaxSettings:
-    MAX_LOOK_DEPTH = 10
+    MAX_LOOK_DEPTH = 6
 
 class GameState(Enum):
     RUNNING = 0

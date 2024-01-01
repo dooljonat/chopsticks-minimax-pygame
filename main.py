@@ -23,6 +23,10 @@ player_sprite   = PlayerSprite()
 
 print("\n\n*****************************\nWelcome to finger chess game!\n*****************************\n")
 
+# TODO: I have become aware that chopsticks is actually a much more complicated
+#       than the ruleset I was using https://en.wikipedia.org/wiki/Chopsticks_(hand_game)
+#       Update ruleset accordingly using a maximum of 14 possible rules
+
 # main game loop
 while not exited:
     # Draw graphics to screen
