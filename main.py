@@ -2,7 +2,7 @@ import pygame
 
 from settings import GameState, Player
 from display_settings import PygameSettings, ColorPalette
-from graphics_objects import Computer
+from graphics_objects import ComputerSprite, PlayerSprite
 from game import Game
 
 # Init game
@@ -17,7 +17,8 @@ screen = pygame.display.set_mode((PygameSettings.SCREEN_WIDTH, PygameSettings.SC
 pygame.display.set_caption('finger chess')
 
 # Init graphics objects
-computer = Computer()
+computer_sprite = ComputerSprite()
+player_sprite   = PlayerSprite()
 
 
 print("\n\n*****************************\nWelcome to finger chess game!\n*****************************\n")
@@ -26,7 +27,8 @@ print("\n\n*****************************\nWelcome to finger chess game!\n*******
 while not exited:
     # Draw graphics to screen
     screen.fill(ColorPalette.BACKGROUND_COLOR)
-    computer.draw(screen, finger_chess)
+    computer_sprite.draw(screen, finger_chess)
+    player_sprite.draw(screen, finger_chess)
 
     # Update display
     pygame.display.flip()
