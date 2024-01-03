@@ -1,12 +1,19 @@
-from settings import Player, Hands, PLAYER_HANDS, COMPUTER_HANDS, ALL_HANDS, GameSettings, GameState
+from settings import Player, Hands, PLAYER_HANDS, COMPUTER_HANDS, ALL_HANDS, GameSettings, GameState, Moves, MoveType
 
 class Board:
-    def get_init_board(self):
+    def get_init_board():
         _board = GameSettings.DEFAULT_BOARD.copy()
         return _board
     
-    def is_valid_attack(self, current_board, indx, target_indx):
+    def is_valid_attack(current_board, current_player, indx, target_indx):
         if indx != target_indx:
+            if current_player == Player.PLAYER:
+                if (indx not in PLAYER_HANDS or target_indx not in COMPUTER_HANDS):
+                    return False
+            if current_player == Player.COMPUTER:
+                if (indx not in COMPUTER_HANDS or target_indx not in PLAYER_HANDS):
+                    return False
+
             if current_board[indx] > 0 and current_board[target_indx] > 0:
                 if indx in PLAYER_HANDS:
                     return target_indx in COMPUTER_HANDS
@@ -14,46 +21,74 @@ class Board:
                     return target_indx in PLAYER_HANDS
         return False
 
-    def is_valid_transfer(self, current_board, indx, target_indx, transfer_amount):
+    def is_valid_transfer(current_board, indx, target_indx, transfer_amount):
         if ((indx in PLAYER_HANDS and target_indx in PLAYER_HANDS) 
             or (indx in COMPUTER_HANDS and target_indx in COMPUTER_HANDS)):
-            if current_board[indx] > 0 and current_board[target_indx] > 0:
-                if transfer_amount < current_board[indx]:
-                    if ((current_board[target_indx] + transfer_amount) <= 4
-                         and (current_board[indx] - transfer_amount) > 0):
-                         return True
+            if transfer_amount < current_board[indx]:
+                if ((current_board[target_indx] + transfer_amount) < 4
+                        and (current_board[indx] - transfer_amount) > 0):
+                        return True
         return False
 
-    def is_valid_division(self, current_board, current_player):
-        if current_player == Player.PLAYER:
-            vals = [current_board[Hands.PLAYER_LEFT], current_board[Hands.PLAYER_RIGHT]]
-            vals.sort()
-            if vals[1] > 1 and vals[0] == 0:
-                return True
-
-        if current_player == Player.COMPUTER:
-            vals = [current_board[Hands.COMPUTER_LEFT], current_board[Hands.COMPUTER_RIGHT]]
-            vals.sort()
-            if vals[1] > 1 and vals[0] == 0:
-                return True
-
-        return False
-
-    def get_possible_board_states_after_turn(self, current_board, current_player):
+    def get_possible_board_states_after_turn(current_board, current_player):
         board_vals = [current_board[hand] for hand in ALL_HANDS]
         possible_board_states = []
 
-        # TODO
-        print(board_vals)
+        if current_player == Player.PLAYER:
+            # Get possible attacks
+            for attack in Moves.PLAYER_ATTACKS:
+                if Board.is_valid_attack(current_board, current_player, attack[0], attack[1]):
+                    _board = current_board.copy()
+                    _board[attack[1]] += _board[attack[0]]
+                    _board = Board.update_board(_board)
+                    possible_board_states += [_board]
+
+            # Get possible transfers
+            for transfer in Moves.PLAYER_TRANSFERS:
+                for possible_transfer_amount in range(1, current_board[transfer[0]]):
+                    if Board.is_valid_transfer(current_board, transfer[0], transfer[1], possible_transfer_amount):
+                        _board = current_board.copy()
+                        _board[transfer[1]] += possible_transfer_amount
+                        _board[transfer[0]] -= possible_transfer_amount
+                        possible_board_states += [_board]
+
+        if current_player == Player.COMPUTER:
+            # Get possible attacks
+            for attack in Moves.COMPUTER_ATTACKS:
+                if Board.is_valid_attack(current_board, current_player, attack[0], attack[1]):
+                    _board = current_board.copy()
+                    _board[attack[1]] += _board[attack[0]]
+                    _board = Board.update_board(_board)
+                    possible_board_states += [_board]
+
+            # Get possible transfers
+            for transfer in Moves.COMPUTER_ATTACKS:
+                for possible_transfer_amount in range(1, current_board[transfer[0]]):
+                    if Board.is_valid_transfer(current_board, transfer[0], transfer[1], possible_transfer_amount):
+                        _board = current_board.copy()
+                        _board[transfer[1]] += possible_transfer_amount
+                        _board[transfer[0]] -= possible_transfer_amount
+                        possible_board_states += [_board]
+                    
 
         return possible_board_states
 
-    def make_move(self, current_board, current_player, indx, target_indx, move_type, transfer_amount=None):
-        pass
+    def make_move(current_board, current_player, indx, target_indx, move_type, transfer_amount=None):
+        _board = current_board.copy()
 
-    def update_board(self, current_board):
+        if move_type == MoveType.ATTACK:
+            if Board.is_valid_attack(_board, current_player, indx, target_indx):
+                _board[target_indx] += _board[indx]
+
+        if move_type == MoveType.TRANSFER:
+            if Board.is_valid_transfer(_board, indx, target_indx, transfer_amount):
+                _board[target_indx] += transfer_amount
+                _board[indx] -= transfer_amount
+
+        return _board
+
+    def update_board(current_board):
         # Update board, terminate hands
-
         _board = current_board.copy()
 
         for hand in ALL_HANDS:
@@ -62,7 +97,7 @@ class Board:
     
         return _board
 
-    def get_game_state(self, current_board, current_turn_number):
+    def get_game_state(current_board, current_turn_number):
         # Get game state
 
         # If game is in a draw (has been running for too many turns)
@@ -85,7 +120,18 @@ class Board:
             else:
                 return GameState.RUNNING
 
-board_object = Board()
-
 board = Board.get_init_board()
 print(board)
+
+board[0] = 0
+board[1] = 2
+print(board)
+
+state = Board.get_game_state(board, 1)
+
+print("\n\n")
+possible_board_states = Board.get_possible_board_states_after_turn(board, Player.PLAYER)
+print(possible_board_states)
+
+possible_board_states = Board.get_possible_board_states_after_turn(board, Player.COMPUTER)
+print(possible_board_states)
