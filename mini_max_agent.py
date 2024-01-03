@@ -20,15 +20,15 @@ class MiniMax:
         if state == GameState.GAME_OVER:
             winner = self.game.get_winner(current_board, current_turn_number)
             current_score = self.MAX_SCORE if winner == Player.COMPUTER else self.MIN_SCORE
-        else:
-            # Incentivize player who got back to init state of 1 on left 1 on right
-            if not (sum(current_board) == 4 and len(set(current_board)) == 1):
-                if (current_board[BoardInfo.PLAYER_LEFT_HAND] == 1 
-                    and current_board[BoardInfo.PLAYER_RIGHT_HAND] == 1):
-                    current_score = self.MIN_SCORE+1
-                if (current_board[BoardInfo.COMPUTER_LEFT_HAND] == 1 
-                    and current_board[BoardInfo.COMPUTER_RIGHT_HAND] == 1):
-                    current_score = self.MAX_SCORE-1
+        # else:
+        #     # Incentivize player who got back to init state of 1 on left 1 on right
+        #     if not (sum(current_board) == 4 and len(set(current_board)) == 1):
+        #         if (current_board[BoardInfo.PLAYER_LEFT_HAND] == 1 
+        #             and current_board[BoardInfo.PLAYER_RIGHT_HAND] == 1):
+        #             current_score = self.MIN_SCORE+1
+        #         if (current_board[BoardInfo.COMPUTER_LEFT_HAND] == 1 
+        #             and current_board[BoardInfo.COMPUTER_RIGHT_HAND] == 1):
+        #             current_score = self.MAX_SCORE-1
 
         return state, current_score
 
@@ -80,6 +80,10 @@ class MiniMax:
 
             print("maximizing computer")
             for move in possible_moves:
+                _board = current_board.copy()
+                _board = self.game.update_board(_board, move[0], move[1])
+                _board = self.game.terminate_hands(_board)
+
                 score = self.minimax(current_board, last_known_turn_number, Player.PLAYER, depth+1)
                 bestScore = max(bestScore, score)
 
@@ -95,6 +99,9 @@ class MiniMax:
 
             print("minimizing player")
             for move in possible_moves:
+                _board = current_board.copy()
+                _board = self.game.update_board(_board, move[0], move[1])
+                _board = self.game.terminate_hands(_board)
                 score = self.minimax(current_board, last_known_turn_number, Player.COMPUTER, depth+1)
                 bestScore = min(bestScore, score)
 
