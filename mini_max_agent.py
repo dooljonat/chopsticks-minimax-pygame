@@ -1,128 +1,64 @@
 import copy
 import math
 
-from settings import GameSettings, BoardInfo, MiniMaxSettings, GameState, Player
+from settings import GameState, Player
+from board import Board
 
 class MiniMax:
-    all_possible_computer_moves = [["S"], [2, 0], [2, 1], [3, 0], [3, 1]]
-    all_possible_human_moves    = [["S"], [0, 2], [0, 3], [1, 2], [1, 3]]
+    MAX_LOOK_DEPTH = 8
 
-    MAX_SCORE = 10
-    MIN_SCORE = -10
+    def minimax(self, current_board, current_game_turn, computer_turn, depth=0):
+        # Current search turn
+        current_search_turn = current_game_turn + depth
 
-    def __init__(self, game):
-        self.game = game 
-
-    def score_game(self, current_board, current_turn_number, current_depth, current_player):
-        state = self.game.check_state(current_board, current_turn_number)
-        current_score = 0
-
-        if state == GameState.GAME_OVER:
-            winner = self.game.get_winner(current_board, current_turn_number)
-            current_score = self.MAX_SCORE if winner == Player.COMPUTER else self.MIN_SCORE
-        # else:
-        #     # Incentivize player who got back to init state of 1 on left 1 on right
-        #     if not (sum(current_board) == 4 and len(set(current_board)) == 1):
-        #         if (current_board[BoardInfo.PLAYER_LEFT_HAND] == 1 
-        #             and current_board[BoardInfo.PLAYER_RIGHT_HAND] == 1):
-        #             current_score = self.MIN_SCORE+1
-        #         if (current_board[BoardInfo.COMPUTER_LEFT_HAND] == 1 
-        #             and current_board[BoardInfo.COMPUTER_RIGHT_HAND] == 1):
-        #             current_score = self.MAX_SCORE-1
-
-        return state, current_score
-
-    def get_possible_moves(self, current_board, current_player):
-        new_moves = []
-
-        # Get moves available to computer/agentprint
-        all_possible_moves = (self.all_possible_computer_moves if current_player == Player.COMPUTER 
-            else self.all_possible_human_moves)
-        player_indices = (BoardInfo.COMPUTER_INDICES if current_player == Player.COMPUTER
-            else BoardInfo.PLAYER_INDICES)
-
-        for move in all_possible_moves:
-            if move[0] == "S":
-                # Check if split is available
-                if self.game.is_valid_split(current_board, player_indices):
-                    new_moves += [move]
-            else:
-                # Check if either move indx or target indx is terminated (making move unavailable)
-                if self.game.is_valid_move(current_board, move[0], move[1]):
-                    new_moves += [move]
-
-        # Return new moves
-        return new_moves
-
-    def minimax(self, current_board, last_known_turn_number, current_player, depth=0):
-        # Init values
-        current_turn_number = last_known_turn_number + depth
-
-        # Get current state and score of the game
-        state, score = self.score_game(current_board, current_turn_number, depth, current_player)
-
-        print("depth: ", depth)
-        print("virtual turn number: ", current_turn_number)
+        # Get current state
+        state = Board.get_game_state(current_board, current_search_turn)
 
         # If game is in a terminated state
-        if (state == GameState.GAME_OVER
-                or state == GameState.DRAW 
-                or depth >= MiniMaxSettings.MAX_LOOK_DEPTH):
-            print("found terminated state: ", state)
-            
-            return score
+        if (state == GameState.COMPUTER_WON):
+            return 100
 
-        # If maximizing (computer)
-        if current_player == Player.COMPUTER:
+        if (state == GameState.PLAYER_WON):
+            return -100
+        
+        if (state == GameState.DRAW):
+            return 0
+
+        if (depth >= self.MAX_LOOK_DEPTH):
+            return 0
+
+        # If player is being maximized (computer)
+        if computer_turn:
             bestScore = -1000
 
-            possible_moves = self.get_possible_moves(current_board, current_player)
+            possible_board_states = Board.get_possible_board_states_after_turn(current_board, Player.COMPUTER)
+            for board in possible_board_states:
+                score = self.minimax(board, current_game_turn, False, depth+1)
+                print(f"\t\tdepth {depth} - score {score}")
 
-            print("maximizing computer")
-            for move in possible_moves:
-                _board = current_board.copy()
-                _board = self.game.update_board(_board, move[0], move[1])
-                _board = self.game.terminate_hands(_board)
-
-                score = self.minimax(current_board, last_known_turn_number, Player.PLAYER, depth+1)
-                bestScore = max(bestScore, score)
-
-                print("\t", move, bestScore)
+                bestScore = max(score, bestScore)
 
             return bestScore
 
-        # If minimizing (player)
-        if current_player == Player.PLAYER:
+        # If player is being minimized (player)
+        else:
             bestScore = 1000
-
-            possible_moves = self.get_possible_moves(current_board, current_player)
-
-            print("minimizing player")
-            for move in possible_moves:
-                _board = current_board.copy()
-                _board = self.game.update_board(_board, move[0], move[1])
-                _board = self.game.terminate_hands(_board)
-                score = self.minimax(current_board, last_known_turn_number, Player.COMPUTER, depth+1)
-                bestScore = min(bestScore, score)
-
-                print("\t", move, bestScore)
+            
+            possible_board_states = Board.get_possible_board_states_after_turn(current_board, Player.PLAYER)
+            for board in possible_board_states:
+                score = self.minimax(board, current_game_turn, True, depth+1)
+                bestScore = min(score, bestScore)
 
             return bestScore
 
-    def get_best_move(self, board, current_turn_number, current_player=Player.COMPUTER):
-        bestScore = -math.inf
-        bestMove = None
+    def get_best_move(self, board, current_turn_number):
+        bestScore = -10_000
+        bestState = None
 
-        for move in self.get_possible_moves(board, current_player):
-            _board = None
-            if move == ["S"]:
-                _board = self.game.split_hands(board, BoardInfo.COMPUTER_INDICES)
-            else:
-                _board = self.game.update_board(board, move[0], move[1])
-            score = self.minimax(board, current_turn_number, current_player)
-            if score != "EMPTY":
-                if score > bestScore:
-                    bestScore = score
-                    bestMove  = move
+        for board_state in Board.get_possible_board_states_after_turn(board, Player.COMPUTER):
+            score = self.minimax(board, current_turn_number, True)
+            if score > bestScore:
+                bestScore = score
+                bestState  = board_state
 
-        return bestMove
+        return bestState

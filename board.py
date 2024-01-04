@@ -50,6 +50,7 @@ class Board:
                         _board = current_board.copy()
                         _board[transfer[1]] += possible_transfer_amount
                         _board[transfer[0]] -= possible_transfer_amount
+                        _board = Board.update_board(_board)
                         possible_board_states += [_board]
 
         if current_player == Player.COMPUTER:
@@ -68,9 +69,9 @@ class Board:
                         _board = current_board.copy()
                         _board[transfer[1]] += possible_transfer_amount
                         _board[transfer[0]] -= possible_transfer_amount
+                        _board = Board.update_board(_board)
                         possible_board_states += [_board]
                     
-
         return possible_board_states
 
     def make_move(current_board, current_player, indx, target_indx, move_type, transfer_amount=None):
@@ -92,8 +93,8 @@ class Board:
         _board = current_board.copy()
 
         for hand in ALL_HANDS:
-            if current_board[hand] >= 5:
-                current_board[hand] = 0
+            if _board[hand] >= 5:
+                _board[hand] = 0
     
         return _board
 
@@ -119,19 +120,3 @@ class Board:
             # If no player won
             else:
                 return GameState.RUNNING
-
-board = Board.get_init_board()
-print(board)
-
-board[0] = 0
-board[1] = 2
-print(board)
-
-state = Board.get_game_state(board, 1)
-
-print("\n\n")
-possible_board_states = Board.get_possible_board_states_after_turn(board, Player.PLAYER)
-print(possible_board_states)
-
-possible_board_states = Board.get_possible_board_states_after_turn(board, Player.COMPUTER)
-print(possible_board_states)
