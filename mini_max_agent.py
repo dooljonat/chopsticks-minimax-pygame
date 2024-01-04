@@ -1,7 +1,7 @@
 import copy
 import math
 
-from settings import GameState, Player
+from settings import GameState, Player, PLAYER_HANDS
 from board import Board
 
 class MiniMax:
