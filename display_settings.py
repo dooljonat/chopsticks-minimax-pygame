@@ -81,3 +81,8 @@ class PlayerSpritePaths:
 
     right_pinky_paths = [right_hand_path_stem + "fingers/pinky/closed.png",
                             right_hand_path_stem + "fingers/pinky/open.png"]
+
+class UISpritePaths:
+    menu_bar = "img/ui/menu_bar.png"
+
+    player_left = "img/ui/player_hand_pointers/player_left.png"
