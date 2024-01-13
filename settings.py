@@ -9,6 +9,10 @@ class Player(Enum):
     PLAYER = 0
     COMPUTER = 1
 
+class PlayerTurnTypes(Enum):
+    IS_ATTACKING = 0
+    IS_TRANSFERRING = 1
+
 class Hands:
     PLAYER_LEFT = 0
     PLAYER_RIGHT = 1
