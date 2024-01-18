@@ -4,11 +4,6 @@ from settings import Hands
 from display_settings import PygameSettings
 from sprite_paths import ComputerSpritePaths, PlayerSpritePaths
 
-# NOTE: All sprites use DEFAULT_POS because all sprites images are hardcoded to be 1280x720
-#       and include their relative positions by default.
-#       I decided to do this because I am lazy. 
-#       This should be fixed when I muster the courage to confront my own shortcomings.
-
 class Button:
     def __init__(self, screen, name, x, y, width, height, hover_image, on_click_function=None, is_active=False, already_clicked=False):
         self.name = name
