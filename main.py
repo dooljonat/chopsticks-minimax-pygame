@@ -1,11 +1,12 @@
 import pygame
 import random
 
-from settings import GameState, Player, Hands, PlayerTurnTypes
+from game_enums import GameState, Player, Hands, PlayerTurnTypes
 from display_settings import PygameSettings, ColorPalette
 from graphics_objects import ComputerSprite, PlayerSprite, Button
 from board import Board
 from mini_max_agent import MiniMax
+from player_input_handler import PlayerInputHandler
 from sprite_paths import ComputerSpritePaths, PlayerSpritePaths, UISpritePaths
 
 # Init pygame
@@ -27,44 +28,6 @@ player_turn = random.choice([True, False])
 
 # Init minimax agent
 computer_agent = MiniMax()
-
-# Create button selection handler functions
-class PlayerInputHandler:
-    last_turn_type = None
-    turn_type = None
-
-    selected_hand = -1
-    selected_target_hand = -1
-    finished_turn = False
-
-    def select_p_left(self):
-        if self.selected_hand == -1:
-            self.selected_hand = Hands.PLAYER_LEFT
-        else:
-            if self.selected_hand != Hands.PLAYER_LEFT:
-                self.selected_target_hand = Hands.PLAYER_LEFT
-
-    def select_p_right(self):
-        if self.selected_hand == -1:
-            self.selected_hand = Hands.PLAYER_RIGHT
-        else:
-            if self.selected_hand != Hands.PLAYER_RIGHT:
-                self.selected_target_hand = Hands.PLAYER_RIGHT
-
-    def select_c_left(self):
-        if self.selected_hand != -1:
-            self.selected_target_hand = Hands.COMPUTER_LEFT
-
-    def select_c_right(self):
-        if self.selected_hand != -1:
-            self.selected_target_hand = Hands.COMPUTER_RIGHT
-    
-    def reset(self):
-        self.last_turn_type = self.turn_type
-        self.turn_type = None
-        self.selected_hand = -1
-        self.selected_target_hand = -1
-        self.finished_turn = False
 
 # Init player input handler
 player_input_handler = PlayerInputHandler()
@@ -127,9 +90,13 @@ while current_state == GameState.RUNNING:
 
         # Player selected a target hand
         if player_input_handler.selected_hand != -1:
-            # Activate computer buttons
-            computer_left_hand_button.is_active = True
-            computer_right_hand_button.is_active = True
+            # Activate computer buttons (if player is not currently transferring)
+            if player_input_handler.last_turn_type != PlayerTurnTypes.IS_TRANSFERRING:
+                computer_left_hand_button.is_active = True
+                computer_right_hand_button.is_active = True
+            else:
+                computer_left_hand_button.is_active = False
+                computer_right_hand_button.is_active = False
 
             # If player hasn't decided what type of move they're making yet
             if not player_input_handler.turn_type:
@@ -143,23 +110,30 @@ while current_state == GameState.RUNNING:
 
             # If player is attacking computer
             if player_input_handler.turn_type == PlayerTurnTypes.IS_ATTACKING:
-                # Update board
-                board[player_input_handler.selected_target_hand] += board[player_input_handler.selected_hand]
+                # Check if player isn't currently in the process of transferring
+                if player_input_handler.last_turn_type != PlayerTurnTypes.IS_TRANSFERRING:
+                    # Check if it is a valid attack
+                    if Board.is_valid_attack(board, Player.PLAYER, player_input_handler.selected_hand, player_input_handler.selected_target_hand):
+                        # Update board
+                        board[player_input_handler.selected_target_hand] += board[player_input_handler.selected_hand]
 
-                # Finish turn
-                player_input_handler.finished_turn = True
+                        # Finish turn
+                        player_input_handler.finished_turn = True
 
             # If player is transferring
             if player_input_handler.turn_type == PlayerTurnTypes.IS_TRANSFERRING:
-                # Update board
-                board[player_input_handler.selected_target_hand] += 1
-                board[player_input_handler.selected_hand] -= 1
+                # Check if it is a valid transfer
+                if Board.is_valid_transfer(board, player_input_handler.selected_hand, player_input_handler.selected_target_hand, 1):
+                    # Update board
+                    board[player_input_handler.selected_target_hand] += 1
+                    board[player_input_handler.selected_hand] -= 1
 
                 # Reset input handler
                 player_input_handler.reset()
 
         if player_input_handler.finished_turn:
             player_input_handler.reset()
+            player_input_handler.last_turn_type = None
 
             player_left_hand_button.is_active = False
             player_right_hand_button.is_active = False

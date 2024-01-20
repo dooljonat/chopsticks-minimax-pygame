@@ -1,6 +1,6 @@
 import pygame
 
-from settings import Hands
+from game_enums import Hands
 from display_settings import PygameSettings
 from sprite_paths import ComputerSpritePaths, PlayerSpritePaths
 
@@ -44,8 +44,6 @@ class Button:
                         # Call click function
                         self.on_click_function()
 
-class PlayerRightHandUISprite:
-    pass
 
 class ComputerLeftHandSprite:
     def __init__(self):
@@ -84,6 +82,7 @@ class ComputerLeftHandSprite:
         # Draw thumb
         screen.blit(self.thumb_img, PygameSettings.DEFAULT_POS)
 
+
 class ComputerRightHandSprite:
     def __init__(self):
         self.palm_img = pygame.image.load(ComputerSpritePaths.right_hand_sprite_path).convert_alpha()
@@ -121,6 +120,7 @@ class ComputerRightHandSprite:
         # Draw thumb
         screen.blit(self.thumb_img, PygameSettings.DEFAULT_POS)
 
+
 class ComputerSprite:
     def __init__(self):
         self.img = pygame.image.load(ComputerSpritePaths.computer_sprite_path).convert_alpha()
@@ -137,6 +137,7 @@ class ComputerSprite:
 
         # Draw right hand
         self.right_hand.draw(screen, board)
+
 
 class PlayerLeftHandSprite():
     def __init__(self):
@@ -176,6 +177,7 @@ class PlayerLeftHandSprite():
         # Draw thumb
         screen.blit(self.thumb_img, PygameSettings.DEFAULT_POS)
 
+
 class PlayerRightHandSprite:
     def __init__(self):
         self.palm_img = pygame.image.load(PlayerSpritePaths.right_hand_sprite_path).convert_alpha()
@@ -213,6 +215,7 @@ class PlayerRightHandSprite:
                 screen.blit(self.ring_imgs[val], PygameSettings.DEFAULT_POS)
             if i == 0:
                 screen.blit(self.pinky_imgs[val], PygameSettings.DEFAULT_POS)
+
 
 class PlayerSprite:
     def __init__(self):

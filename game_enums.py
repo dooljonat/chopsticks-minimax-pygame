@@ -1,10 +1,5 @@
 from enum import Enum
 
-class GameSettings:
-    DEFAULT_BOARD = [1,1,1,1]
-
-    DEFAULT_TURNS_RESULTING_IN_DRAW=100
-
 class Player(Enum):
     PLAYER = 0
     COMPUTER = 1
@@ -57,7 +52,3 @@ class GameState(Enum):
     DRAW = 1
     PLAYER_WON = 2
     COMPUTER_WON = 3
-
-# class Player(Enum):
-#     PLAYER = 1
-#     COMPUTER = 2

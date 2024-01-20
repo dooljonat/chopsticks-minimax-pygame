@@ -1,0 +1,4 @@
+class GameSettings:
+    DEFAULT_BOARD = [1,1,1,1]
+
+    DEFAULT_TURNS_RESULTING_IN_DRAW=100

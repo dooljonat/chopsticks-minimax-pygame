@@ -1,4 +1,5 @@
-from settings import Player, Hands, PLAYER_HANDS, COMPUTER_HANDS, ALL_HANDS, GameSettings, GameState, Moves, MoveType
+from game_enums import Player, Hands, PLAYER_HANDS, COMPUTER_HANDS, ALL_HANDS, GameState, Moves, MoveType
+from game_settings import GameSettings
 
 class Board:
     def get_init_board():
