@@ -1,3 +1,5 @@
+from game_enums import Hands
+
 class PlayerInputHandler:
     last_turn_type = None
     turn_type = None
